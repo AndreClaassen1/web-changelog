@@ -1,0 +1,47 @@
+{# Das gesamte Markup der Bibliothek. Seite und Dialog rufen nur diese Makros
+   auf, damit es nirgends doppelt gepflegt werden muss. #}
+
+{# Rubriken als Zeilen: Badge links, Punkte rechts. Ohne Versionskopf ist das
+   die Form des Dialogs; die Verlaufsseite setzt einen Kopf davor.
+   Die CSS-Klasse haengt an der Art, nicht am Anzeigenamen: "Verbessert" und
+   "Geaendert" sollen dieselbe Farbe tragen. #}
+{% macro rubrikliste(rubriken, vokabular) -%}
+{% for rubrik in rubriken %}
+<div class="wc-rubrik">
+  <span class="wc-badge wc-badge-{{ rubrik.art.value }}">{{ rubrik.label(vokabular) }}</span>
+  <ul class="wc-liste">
+    {# Ein Punkt kann mehrere Absaetze haben, wenn das Fragment welche hatte.
+       Der erste steht direkt im li, damit einabsaetzige Punkte unveraendert
+       aussehen; jeder weitere bekommt einen eigenen Absatz. #}
+    {% for punkt in rubrik.absaetze %}<li>{{ punkt[0] }}
+      {%- for weiterer in punkt[1:] %}<p class="wc-absatz">{{ weiterer }}</p>{% endfor %}</li>{% endfor %}
+  </ul>
+</div>
+{% endfor %}
+{%- endmacro %}
+
+{# Der volle Verlauf als Zeitleiste: die Form der Seite. #}
+{% macro verlauf(changelog, vokabular, aktuelle_version=None) -%}
+{% set versionen = changelog.veroeffentlichte %}
+{% if versionen %}
+<div class="wc-verlauf wc-root">
+  {% for v in versionen %}
+  <div class="wc-version">
+    <div class="wc-marker" aria-hidden="true"></div>
+    <div class="wc-body">
+      <div class="wc-head">
+        <span class="wc-tag">v{{ v.version }}</span>
+        {% if v.datum_de %}<span class="wc-datum">{{ v.datum_de }}</span>{% endif %}
+        {% if aktuelle_version and v.nummer == aktuelle_version %}
+        <span class="wc-aktuell">aktuell</span>
+        {% endif %}
+      </div>
+      {{ rubrikliste(v.rubriken, vokabular) }}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="wc-root"><p class="wc-leer">Noch keine Versionshistorie vorhanden.</p></div>
+{% endif %}
+{%- endmacro %}

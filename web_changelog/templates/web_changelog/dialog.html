@@ -1,0 +1,26 @@
+{# "Was ist neu" nach einem Update. Natives <dialog>: Fokusfalle, Escape und
+   Hintergrund-Abdunklung kommen vom Browser, nicht aus eigenem JavaScript. #}
+{% import "web_changelog/makros.html" as wc %}
+<dialog class="wc-dialog wc-root" data-wc-dialog aria-labelledby="wc-dialog-titel">
+  <div class="wc-dialog-kopf">
+    <div class="wc-dialog-meta">
+      <span class="wc-tag">v{{ faellig.neueste.version }}</span>
+      {% if faellig.neueste.datum_de %}<span class="wc-datum">{{ faellig.neueste.datum_de }}</span>{% endif %}
+    </div>
+    <h2 class="wc-dialog-titel" id="wc-dialog-titel">Neu{% if app_name %} in {{ app_name }}{% endif %}</h2>
+    {# Ohne Anrede formuliert: die einbindenden Anwendungen siezen ihre Nutzer,
+       ein "deiner" faellt dort als Stilbruch auf. #}
+    <p class="wc-dialog-sub">Seit Version {{ faellig.vorher }} hat sich Folgendes geändert</p>
+  </div>
+
+  <div class="wc-dialog-inhalt">
+    {{ wc.rubrikliste(rubriken, vokabular) }}
+  </div>
+
+  <div class="wc-dialog-fuss">
+    {# url_for statt roher Pfad, damit der Link auch unter einem Unterpfad traegt. #}
+    <a href="{{ url_for('web_changelog.seite') }}" class="wc-link">Alle Änderungen ansehen</a>
+    <button type="button" class="wc-btn" data-wc-schliessen autofocus>Verstanden</button>
+  </div>
+</dialog>
+<script src="{{ dialog_js }}" defer></script>

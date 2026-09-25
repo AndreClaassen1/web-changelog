@@ -1,0 +1,153 @@
+/**
+ * web-changelog
+ * =============
+ * Verlaufsseite und Was-ist-neu-Dialog.
+ *
+ * Farben und Masse kommen ausschliesslich aus --wc-*-Custom-Properties mit
+ * Fallback. Eine Anwendung bindet ihr Design an, indem sie die Tokens auf
+ * `.wc-root` setzt; nichts hier greift auf Klassen der Anwendung zu, und alle
+ * eigenen Klassen tragen das Praefix wc-, damit nichts kollidiert.
+ */
+
+/* Neutrale Standardwerte, bewusst markenfrei: eine Anwendung ohne eigenes
+   Design soll brauchbar aussehen, aber keine fremde Hausfarbe erben. Wer ein
+   Design hat, legt diese Tokens auf seine eigenen. Auch die Schriftfamilie
+   bleibt generisch, weil die Bibliothek keine Webschrift ausliefert.
+
+   `:where()` haelt die Spezifitaet dieser Zeile auf null, damit ein schlichtes
+   `.wc-root { --wc-akzent: ... }` der Anwendung immer gewinnt. Ohne das kaeme
+   es auf die Ladereihenfolge an, und die spricht gegen die Anwendung:
+   `wc_head()` steht ueblicherweise hinter deren eigenem Stylesheet, womit bei
+   gleicher Spezifitaet die Bibliothek gewinnt und die Anbindung ans eigene
+   Design stillschweigend ins Leere laeuft. */
+:where(.wc-root) {
+  --wc-akzent: #2A5D9F;
+  --wc-akzent-subtil: #EDF2F9;
+  --wc-gruen: #2E7D32;
+  --wc-gruen-bg: #E8F5E9;
+  --wc-bg: #F7F7F6;
+  --wc-flaeche: #FFFFFF;
+  --wc-flaeche-alt: #F0F0EE;
+  --wc-text: #1A1A1A;
+  --wc-text-schwach: #5F5F5A;
+  --wc-text-leise: #85857E;
+  --wc-rand: #E0E0DC;
+  --wc-rand-leicht: #EAEAE6;
+  --wc-radius: 8px;
+  --wc-radius-pill: 999px;
+  --wc-font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --wc-schatten: 0 2px 8px rgba(0, 0, 0, 0.08);
+  /* Breite des Dialogs. Die Punkte im Changelog sind Prosa, keine Stichworte:
+     abzueglich der Badge-Spalte bleibt hier eine Textspalte von rund 500px,
+     also eine Zeilenlaenge, die sich lesen laesst. Eine Anwendung mit langen
+     Eintraegen kann das Token hochsetzen. */
+  --wc-dialog-breite: 680px;
+}
+
+/* -- Zeitleiste ---------------------------------------------------------- */
+
+.wc-verlauf { max-width: 760px; margin: 0 auto; }
+.wc-version { position: relative; padding-left: 28px; padding-bottom: 8px; }
+.wc-version::before {
+  content: ""; position: absolute; left: 5px; top: 6px; bottom: -8px;
+  width: 2px; background: var(--wc-rand-leicht);
+}
+.wc-version:last-child::before { display: none; }
+.wc-marker {
+  position: absolute; left: 0; top: 4px; width: 12px; height: 12px;
+  border-radius: 50%; background: var(--wc-akzent);
+  box-shadow: 0 0 0 3px var(--wc-bg);
+}
+.wc-body {
+  margin-bottom: 20px; padding: 24px;
+  background: var(--wc-flaeche); border: 1px solid var(--wc-rand);
+  border-radius: var(--wc-radius);
+}
+.wc-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
+.wc-tag {
+  font-family: var(--wc-font-mono); font-weight: 600;
+  font-size: 1rem; color: var(--wc-akzent);
+}
+.wc-datum { font-size: 0.85rem; color: var(--wc-text-leise); }
+.wc-aktuell {
+  font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.04em; padding: 2px 8px;
+  border-radius: var(--wc-radius-pill);
+  color: var(--wc-akzent); background: var(--wc-akzent-subtil);
+}
+.wc-leer { color: var(--wc-text-schwach); }
+
+/* -- Rubriken ------------------------------------------------------------ */
+
+/* Feste Badge-Spalte, damit die Spiegelstriche aller Rubriken buendig
+   untereinander beginnen (sonst verschieben sie sich mit der Badge-Breite). */
+.wc-rubrik {
+  display: grid; grid-template-columns: 108px minmax(0, 1fr);
+  gap: 12px; margin-top: 12px; align-items: start;
+}
+.wc-badge {
+  justify-self: start; margin-top: 2px; font-size: 0.68rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 3px 9px; border-radius: var(--wc-radius-pill);
+  /* Neutraler Fallback; die Modifier unten ueberschreiben ihn. Eine unbekannte
+     Rubrik bleibt so lesbar statt ungestylt. */
+  color: var(--wc-text-schwach); background: var(--wc-flaeche-alt);
+}
+/* Nur die Arten, die vom neutralen Fallback abweichen sollen. Behoben,
+   Veraltet und Entfernt bleiben bewusst neutral und brauchen keine Regel. */
+.wc-badge-neu { color: var(--wc-gruen); background: var(--wc-gruen-bg); }
+.wc-badge-geaendert,
+.wc-badge-sicherheit { color: var(--wc-akzent); background: var(--wc-akzent-subtil); }
+
+.wc-liste { margin: 0; padding-left: 18px; }
+.wc-liste li { margin: 2px 0; line-height: 1.5; }
+/* Folgeabsatz innerhalb eines Punktes: abgesetzt, aber ohne eigenen Marker. */
+.wc-liste li .wc-absatz { margin: 6px 0 0; }
+
+/* -- Dialog -------------------------------------------------------------- */
+
+.wc-dialog {
+  width: min(var(--wc-dialog-breite), calc(100vw - 40px));
+  /* margin und max-height explizit, nicht auf die Browser-Vorgabe verlassen:
+     ein globales Reset in der Anwendung (etwa `* { margin: 0 }`) setzt sonst
+     das automatische Zentrieren des dialog-Elements ausser Kraft, und der
+     Hinweis klebt am linken Rand. */
+  margin: auto; max-height: calc(100vh - 80px);
+  padding: 0; border: 1px solid var(--wc-rand);
+  border-radius: 12px; background: var(--wc-flaeche);
+  color: var(--wc-text); box-shadow: var(--wc-schatten);
+}
+.wc-dialog::backdrop { background: rgba(26, 26, 26, 0.5); }
+
+.wc-dialog-kopf { padding: 24px 24px 18px; border-bottom: 1px solid var(--wc-rand); }
+.wc-dialog-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.wc-dialog-titel { margin: 0; font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em; }
+.wc-dialog-sub { margin: 5px 0 0; font-size: 0.85rem; color: var(--wc-text-schwach); }
+
+.wc-dialog-inhalt { padding: 20px 24px 4px; max-height: 55vh; overflow-y: auto; }
+.wc-dialog-inhalt .wc-rubrik:first-child { margin-top: 0; }
+
+.wc-dialog-fuss {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 16px 24px; border-top: 1px solid var(--wc-rand);
+  background: var(--wc-bg);
+}
+.wc-link { font-size: 0.85rem; color: var(--wc-akzent); text-decoration: none; }
+.wc-link:hover { text-decoration: underline; }
+.wc-btn {
+  font: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+  padding: 9px 20px; border: none; border-radius: var(--wc-radius);
+  color: #FAFAF8; background: var(--wc-akzent);
+}
+.wc-btn:hover { filter: brightness(1.1); }
+
+/* -- Eigenstaendiges Layout ---------------------------------------------- */
+/* Greift nur, wenn die Anwendung kein eigenes Layout mitbringt. */
+
+body.wc-standalone {
+  margin: 0; background: var(--wc-bg, #FAFAF8); color: var(--wc-text, #1A1A1A);
+  font-family: system-ui, -apple-system, sans-serif; line-height: 1.6;
+}
+.wc-seite { max-width: 820px; margin: 0 auto; padding: 40px 24px; }
+.wc-titel { margin: 0; font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; }
+.wc-untertitel { margin: 4px 0 32px; color: var(--wc-text-schwach, #6B6B63); }

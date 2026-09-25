@@ -1,0 +1,19 @@
+{# Eigenstaendiges Layout fuer Anwendungen ohne eigenes Basis-Template.
+   Wer ein eigenes Design hat, legt eine gleichnamige Datei im eigenen
+   templates/-Ordner an; der App-Loader gewinnt gegen den des Blueprints. #}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Neuigkeiten{% if app_name %} &middot; {{ app_name }}{% endif %}{% endblock %}</title>
+  {{ wc_head() }}
+</head>
+<body class="wc-standalone">
+  <main class="wc-seite">
+    <h1 class="wc-titel">Neuigkeiten</h1>
+    <p class="wc-untertitel">Was sich von Version zu Version geändert hat</p>
+    {% block wc_inhalt %}{% endblock %}
+  </main>
+</body>
+</html>

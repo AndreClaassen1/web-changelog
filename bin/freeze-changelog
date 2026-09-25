@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+"""Friert die offenen Changelog-Eintraege auf eine Version ein.
+
+Duenner Aufruf von ``web_changelog.freeze``; die Logik liegt im Paket. Der
+Aufrufvertrag bleibt der des frueheren Skripts, damit der ``/version``-Skill
+unveraendert funktioniert:
+
+    bin/freeze-changelog <version> [<datum>]
+"""
+
+import sys
+
+from web_changelog.freeze import main
+
+if __name__ == "__main__":
+    sys.exit(main())

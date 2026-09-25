@@ -1,0 +1,62 @@
+[build-system]
+requires = [
+    "setuptools>=61.0",
+    "wheel",
+    "setuptools_scm",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "web-changelog"
+dynamic = [
+    "dependencies",
+]
+version = "0.1.0"
+description = "Changelog-Seite und Was-ist-neu-Dialog fuer Flask-Anwendungen"
+authors = [
+    { name = "André Claaßen", email = "info@andreclaassen.de" },
+]
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Framework :: Flask",
+]
+
+[project.license]
+text = "MIT"
+
+[project.urls]
+Homepage = "https://github.com/AndreClaassen1/web-changelog"
+Repository = "https://github.com/AndreClaassen1/web-changelog"
+
+[project.scripts]
+freeze-changelog = "web_changelog.freeze:cli"
+
+[tool.setuptools.packages.find]
+where = [
+    ".",
+]
+exclude = [
+    "tests",
+    "tests.*",
+    "features",
+    "features.*",
+]
+
+# Templates und statische Dateien MUESSEN mit ins Wheel, sonst schlaegt das
+# Rendern erst zur Laufzeit mit TemplateNotFound fehl — bei gruenem Health-Check.
+# Als erstes Paket unter libs/ liefert web-changelog Package-Data aus; der
+# Build-Job prueft das Wheel deshalb explizit.
+[tool.setuptools.package-data]
+web_changelog = [
+    "templates/**/*",
+    "static/**/*",
+]
+
+[tool.setuptools.dynamic.dependencies]
+file = [
+    "./requirements.txt",
+]

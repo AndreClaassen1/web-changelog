@@ -1,0 +1,9 @@
+{# Die Verlaufsseite. Erbt von `layout_template`; eine Anwendung mit eigenem
+   Design legt dafuer eine eigene Datei `web_changelog/layout.html` an, die
+   diese hier per Loader-Praezedenz verdraengt. #}
+{% extends layout_template %}
+
+{% block wc_inhalt %}
+{% import "web_changelog/makros.html" as wc %}
+{{ wc.verlauf(changelog, vokabular, aktuelle_version) }}
+{% endblock %}
